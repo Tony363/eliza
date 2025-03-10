@@ -364,7 +364,9 @@ async function handlePluginImporting(plugins: string[]) {
         const importedPlugins = await Promise.all(
             plugins.map(async (plugin) => {
                 try {
+                    console.log(plugin)
                     const importedPlugin = await import(plugin);
+                    console.log(importedPlugin);
                     const functionName =
                         plugin
                             .replace("@elizaos/plugin-", "")
