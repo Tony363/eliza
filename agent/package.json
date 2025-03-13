@@ -18,7 +18,11 @@
         "exec": "node --enable-source-maps --loader ts-node/esm src/index.ts"
     },
     "dependencies": {
-        "@elizaos-plugins/plugin-image-generation": "workspace:^",
+        "@elizaos/plugin-image-generation": "workspace:^",
+        "@elizaos-plugins/plugin-twitter": "workspace:^",
+        "@elizaos-plugins/plugin-web-search": "workspace:^",
+        "@elizaos-plugins/client-twitter": "workspace:^",
+        "@elizaos-plugins/client-discord": "workspace:^",
         "@elizaos/client-direct": "workspace:*",
         "@elizaos/core": "workspace:*",
         "@elizaos/plugin-bootstrap": "workspace:*",

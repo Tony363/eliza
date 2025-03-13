@@ -504,10 +504,10 @@ export const models: Models = {
                 name:
                     settings.SMALL_OPENROUTER_MODEL ||
                     settings.OPENROUTER_MODEL ||
-                    "nousresearch/hermes-3-llama-3.1-405b",
+                    "meta-llama/llama-3-8b-instruct",
                 stop: [],
-                maxInputTokens: 128000,
-                maxOutputTokens: 8192,
+                maxInputTokens: 4096,
+                maxOutputTokens: 2048,
                 frequency_penalty: 0.4,
                 presence_penalty: 0.4,
                 temperature: 0.7,
@@ -516,10 +516,10 @@ export const models: Models = {
                 name:
                     settings.MEDIUM_OPENROUTER_MODEL ||
                     settings.OPENROUTER_MODEL ||
-                    "nousresearch/hermes-3-llama-3.1-405b",
+                    "mistralai/mistral-7b-instruct",
                 stop: [],
-                maxInputTokens: 128000,
-                maxOutputTokens: 8192,
+                maxInputTokens: 4096,
+                maxOutputTokens: 2048,
                 frequency_penalty: 0.4,
                 presence_penalty: 0.4,
                 temperature: 0.7,
@@ -528,10 +528,10 @@ export const models: Models = {
                 name:
                     settings.LARGE_OPENROUTER_MODEL ||
                     settings.OPENROUTER_MODEL ||
-                    "nousresearch/hermes-3-llama-3.1-405b",
+                    "meta-llama/llama-3-70b-instruct",
                 stop: [],
-                maxInputTokens: 128000,
-                maxOutputTokens: 8192,
+                maxInputTokens: 4096,
+                maxOutputTokens: 2048,
                 frequency_penalty: 0.4,
                 presence_penalty: 0.4,
                 temperature: 0.7,
