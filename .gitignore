@@ -2,6 +2,7 @@ node_modules
 /out
 
 .env
+.envgit 
 .env.production
 .env.local
 .env_main

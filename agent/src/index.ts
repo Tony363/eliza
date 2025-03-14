@@ -17,6 +17,8 @@ import {
     settings,
     stringToUuid,
     validateCharacterConfig,
+    ServiceType,
+    generateText
 } from "@elizaos/core";
 import { defaultCharacter } from "./defaultCharacter.ts";
 
@@ -603,7 +605,7 @@ export async function createAgent(
     token: string
 ): Promise<AgentRuntime> {
     elizaLogger.log(`Creating runtime for character ${character.name}`);
-    return new AgentRuntime({
+    const runtime = new AgentRuntime({
         token,
         modelProvider: character.modelProvider,
         evaluators: [],
@@ -619,6 +621,53 @@ export async function createAgent(
         fetch: logFetch,
         // verifiableInferenceAdapter,
     });
+    
+    // Register a text generation service wrapper that implements the Service interface
+    try {
+        // Create a service that implements the Service interface required by the runtime
+        const textGenerationService = {
+            // Service interface required properties
+            serviceType: ServiceType.TEXT_GENERATION,  // Changed 'type' to 'serviceType' to match interface
+            name: "text_generation",
+            runtime,
+            
+            // Required methods from Service interface
+            initialize: async () => {
+                elizaLogger.info("Text generation service initialized");
+                return Promise.resolve();
+            },
+            
+            // Text generation methods
+            async generateText({
+                context,
+                modelClass,
+                temperature,
+                stop,
+                frequency_penalty,
+                presence_penalty,
+                max_tokens
+            }: any) {
+                return await generateText({
+                    runtime,
+                    context,
+                    modelClass,
+                    temperature,
+                    stop,
+                    frequency_penalty,
+                    presence_penalty,
+                    max_tokens
+                });
+            }
+        };
+        
+        // Register the service with the runtime
+        await runtime.registerService(textGenerationService);
+        elizaLogger.info("Text generation service registered successfully");
+    } catch (error) {
+        elizaLogger.error("Failed to register text generation service:", error);
+    }
+    
+    return runtime;
 }
 
 function initializeFsCache(baseDir: string, character: Character) {

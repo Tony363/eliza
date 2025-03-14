@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliza Image Generation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Eliza Image Generation Test</h1>
+    <div class="form-group">
+        <label for="agentId">Agent ID:</label>
+        <input type="text" id="agentId" value="b850bc30-45f8-0041-a00a-83df46d8555d">
+    </div>
+    <div class="form-group">
+        <label for="message">Message:</label>
+        <textarea id="message" rows="5">Generate an image of a beautiful sunset over the ocean with vibrant colors. Make sure to post it to Twitter.</textarea>
+    </div>
+    <div class="form-group">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" value="test-user-123">
+    </div>
+    <div class="form-group">
+        <label for="roomId">Room ID:</label>
+        <input type="text" id="roomId" value="test-room-456">
+    </div>
+    <div class="form-group">
+        <label for="userName">User Name:</label>
+        <input type="text" id="userName" value="TestUser">
+    </div>
+    <button id="sendButton">Send Message</button>
+    
+    <div id="response"></div>
+    
+    <script>
+        document.getElementById('sendButton').addEventListener('click', async () => {
+            const agentId = document.getElementById('agentId').value;
+            const message = document.getElementById('message').value;
+            const userId = document.getElementById('userId').value;
+            const roomId = document.getElementById('roomId').value;
+            const userName = document.getElementById('userName').value;
+            
+            const url = `http://localhost:3000/${agentId}/message`;
+            const responseDiv = document.getElementById('response');
+            
+            responseDiv.textContent = 'Sending request...';
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        text: message,
+                        userId,
+                        roomId,
+                        userName
+                    }),
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                
+                // Check if the response contains any information about image generation or Twitter posting
+                const responseText = JSON.stringify(data);
+                if (responseText.includes('image') || responseText.includes('generate')) {
+                    console.log('Image generation appears to be triggered!');
+                }
+                
+                if (responseText.includes('Twitter') || responseText.includes('tweet')) {
+                    console.log('Twitter posting may have been mentioned in the response.');
+                }
+                
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
