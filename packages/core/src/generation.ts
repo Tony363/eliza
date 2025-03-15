@@ -1666,13 +1666,42 @@ export async function generateMessageResponse({
                 modelClass,
             });
 
-            // try parsing the response as JSON, if null then try again
-            const parsedContent = parseJSONObjectFromText(response) as Content;
-            if (!parsedContent) {
-                elizaLogger.debug("parsedContent is null, retrying");
+            // Additional logging to help debug JSON parsing issues
+            elizaLogger.debug("Raw response from model:", response.substring(0, 100) + (response.length > 100 ? '...' : ''));
+            
+            // Try parsing the response as JSON, if null then try again
+            let parsedContent;
+            try {
+                parsedContent = parseJSONObjectFromText(response) as Content;
+                if (!parsedContent) {
+                    elizaLogger.warn("Failed to parse response as JSON, attempting to extract action from text");
+                    
+                    // Fallback mechanism: check if we can parse a simple action from the text
+                    // This handles responses like "Here is the response: { "user": "Eliza", "text": "message", "action": "POST_TWEET" }"
+                    
+                    // Check for common action patterns in the text
+                    const actionMatch = response.match(/["']action["']\s*:\s*["']([A-Z_]+)["']/i);
+                    const textMatch = response.match(/["']text["']\s*:\s*["']([^"']+)["']/i);
+                    
+                    if (actionMatch && textMatch) {
+                        elizaLogger.log("Extracted action and text from response");
+                        // Create a minimal valid Content object
+                        parsedContent = {
+                            user: "Eliza",
+                            text: textMatch[1],
+                            action: actionMatch[1] as any
+                        };
+                    } else {
+                        elizaLogger.debug("Could not extract action from text, retrying");
+                        continue;
+                    }
+                }
+            } catch (parseError) {
+                elizaLogger.error("Error during JSON parsing:", parseError);
                 continue;
             }
 
+            elizaLogger.log("Successfully parsed response:", parsedContent);
             return parsedContent;
         } catch (error) {
             elizaLogger.error("ERROR:", error);

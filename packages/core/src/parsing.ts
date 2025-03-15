@@ -143,24 +143,64 @@ export function parseJSONObjectFromText(
     text: string
 ): Record<string, any> | null {
     let jsonData = null;
-    const jsonBlockMatch = text.match(jsonBlockPattern);
+    
+    // Check for common prefixes and remove them before parsing
+    const prefixRegex = /^(Here is (the next|a|th[a-z]*) message for Eliza:)|(Here is (the|a) response:)|(Here's a message:)|(The response is:)|(Here is th)/i;
+    const cleanedText = text.replace(prefixRegex, '').trim();
+    
+    // Log for debugging purposes
+    console.debug(`Attempting to parse text as JSON: ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
+    console.debug(`After prefix removal: ${cleanedText.substring(0, 50)}${cleanedText.length > 50 ? '...' : ''}`);
+    
+    // Extra check - see if the text contains JSON object pattern with extra text around it
+    const jsonObjectPattern = /({\s*"[^"]*"\s*:.*})/s;
+    const jsonMatch = text.match(jsonObjectPattern);
+    if (jsonMatch) {
+        try {
+            return JSON.parse(jsonMatch[1]);
+        } catch (e) {
+            // Extraction failed, continue with normal parsing
+            console.debug("Extracted JSON object failed to parse, continuing with normal flow");
+        }
+    }
+    
+    // First try direct JSON parsing if text looks like a JSON object
+    try {
+        if (cleanedText.trim().startsWith('{') && cleanedText.trim().endsWith('}')) {
+            return JSON.parse(cleanedText);
+        }
+    } catch (error) {
+        // If direct parsing fails, continue with other methods
+        console.debug("Direct JSON parsing failed, trying other methods");
+    }
+    
+    const jsonBlockMatch = cleanedText.match(jsonBlockPattern);
 
     if (jsonBlockMatch) {
-        text = cleanJsonResponse(text);
+        text = cleanJsonResponse(cleanedText);
         const parsingText = normalizeJsonString(text);
         try {
             jsonData = JSON.parse(parsingText);
         } catch (e) {
             console.error("Error parsing JSON:", e);
             console.error("Text is not JSON", text);
+            // Try to extract a JSON object from the text
+            const jsonObjectMatch = text.match(/{[\s\S]*?}/); 
+            if (jsonObjectMatch) {
+                try {
+                    return JSON.parse(jsonObjectMatch[0]);
+                } catch (err) {
+                    console.error("Failed to extract JSON object", err);
+                }
+            }
             return extractAttributes(text);
         }
     } else {
         const objectPattern = /{[\s\S]*?}?/;
-        const objectMatch = text.match(objectPattern);
+        const objectMatch = cleanedText.match(objectPattern);
 
         if (objectMatch) {
-            text = cleanJsonResponse(text);
+            text = cleanJsonResponse(cleanedText);
             const parsingText = normalizeJsonString(text);
             try {
                 jsonData = JSON.parse(parsingText);
