@@ -1221,6 +1221,13 @@ export const models: Models = {
             },
         },
     },
+    [ModelProviderName.RENDERNET]: {
+        model: {
+            [ModelClass.IMAGE]: {
+                name: settings.IMAGE_RENDERNET_MODEL || "JuggernautXL",
+            },
+        },
+    },
 };
 
 export function getModelSettings(
