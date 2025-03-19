@@ -1,0 +1,30 @@
+{
+  "name": "@elizaos/plugin-twitter-scheduled-images",
+  "version": "1.0.0",
+  "description": "Plugin for scheduled image generation and posting to Twitter",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "lint": "eslint src --ext .ts",
+    "prebuild": "npm run clean"
+  },
+  "dependencies": {
+    "@elizaos/core": "workspace:*",
+    "agent-twitter-client": "workspace:*",
+    "node-fetch": "^3.3.0"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "workspace:*",
+    "agent-twitter-client": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.9.4"
+  }
+}
